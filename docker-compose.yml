@@ -6,6 +6,7 @@ services:
      cap_add:
        - NET_ADMIN
      container_name: vpn_openvpn
+     hostname: openvpn
      image: kylemanna/openvpn
      ports:
        - "1194:1194/udp"
@@ -27,7 +28,7 @@ services:
      restart: always
      networks:
        vpn-net:
-         ipv4_address: 172.110.1.3
+         ipv4_address: 172.16.110.3
      logging:
        driver: "json-file"
        options:
@@ -37,6 +38,7 @@ services:
    pihole:
      image: pihole/pihole
      container_name: vpn_pihole
+     hostname: pihole
      cap_add:
        - NET_ADMIN     
      dns:
@@ -49,10 +51,10 @@ services:
        #- "553:53/udp"
        - "8081:80/tcp"
      environment:
-       WEBPASSWORD: fcvFjLIO2hWhkFCi
-# #1 Digitalcourage | #2 Chaos Computer Club
-       DNS1: 46.182.19.48
-       DNS2: 213.73.91.35
+       WEBPASSWORD: qq86rZmCHcn)QXxNWpdkab
+# OpenDNS servers
+       DNS1: 208.67.222.222
+       DNS2: 208.67.220.220
      volumes:
        - ./pihole:/etc/pihole
        - ./pihole/dnsmasq.d:/etc/dnsmasq.d
@@ -61,7 +63,7 @@ services:
      restart: always
      networks:
        vpn-net:
-         ipv4_address: 172.110.1.4     
+         ipv4_address: 172.16.110.4     
      logging:
        driver: "json-file"
        options:
@@ -71,4 +73,9 @@ services:
 # docker network create --driver=bridge --subnet=172.110.1.0/24 --gateway=172.110.1.1 vpn-net
 networks:
   vpn-net:
-    external: true
+    driver: bridge
+    name: vpn-net
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.110.0/24
